@@ -629,13 +629,36 @@
     }
   });
 
-  // Touch swipe controls on canvas
+  // Touch swipe controls + hold-to-pause on stage
   let touchStart = null;
-  canvas.addEventListener(
+  let holdPauseTimer = null;
+  let isHoldPaused = false;
+  const HOLD_PAUSE_MS = 220;
+
+  function clearHoldPauseTimer() {
+    if (holdPauseTimer !== null) {
+      clearTimeout(holdPauseTimer);
+      holdPauseTimer = null;
+    }
+  }
+
+  stageWrap.addEventListener(
     'touchstart',
     (e) => {
+      if (e.target.closest('button')) return;
       const t = e.touches[0];
       touchStart = { x: t.clientX, y: t.clientY };
+
+      if (gameState === 'playing') {
+        clearHoldPauseTimer();
+        holdPauseTimer = setTimeout(() => {
+          holdPauseTimer = null;
+          if (gameState === 'playing') {
+            isHoldPaused = true;
+            togglePause();
+          }
+        }, HOLD_PAUSE_MS);
+      }
     },
     { passive: true }
   );
@@ -647,7 +670,11 @@
       const t = e.touches[0];
       const dx = t.clientX - touchStart.x;
       const dy = t.clientY - touchStart.y;
+      if (Math.abs(dx) > 14 || Math.abs(dy) > 14) {
+        clearHoldPauseTimer();
+      }
       if (Math.abs(dx) < 22 && Math.abs(dy) < 22) return;
+      if (isHoldPaused || gameState !== 'playing') return;
       if (Math.abs(dx) > Math.abs(dy)) {
         queueDirection(dx > 0 ? 'right' : 'left');
       } else {
@@ -657,6 +684,20 @@
     },
     { passive: true }
   );
+
+  function releaseHoldPause() {
+    clearHoldPauseTimer();
+    touchStart = null;
+    if (isHoldPaused) {
+      isHoldPaused = false;
+      if (gameState === 'paused') {
+        togglePause();
+      }
+    }
+  }
+
+  window.addEventListener('touchend', releaseHoldPause, { passive: true });
+  window.addEventListener('touchcancel', releaseHoldPause, { passive: true });
 
   // On-screen D-pad
   document.querySelectorAll('.dpad-btn').forEach((btn) => {
