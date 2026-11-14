@@ -13,11 +13,11 @@
   const itchStatus = document.getElementById('itchStatus');
   const itchFill = document.getElementById('itchFill');
 
-  const GRID = 20;
+  const GRID = 14;
   const CELL = canvas.width / GRID;
   const SCRATCH_INTERVAL_MS = 4000;
   const SCRATCH_DURATION_MS = 1350;
-  const BASE_STEP_MS = 185;
+  const BASE_STEP_MS = 210;
   const MIN_STEP_MS = 70;
 
   const DIRS = {
@@ -127,11 +127,13 @@
   }
 
   function resetGame() {
+    const midY = Math.floor(GRID / 2);
+    const headX = Math.floor(GRID / 2) - 1;
     snake = [
-      { x: 8, y: 10 },
-      { x: 7, y: 10 },
-      { x: 6, y: 10 },
-      { x: 5, y: 10 },
+      { x: headX, y: midY },
+      { x: headX - 1, y: midY },
+      { x: headX - 2, y: midY },
+      { x: headX - 3, y: midY },
     ];
     dir = 'right';
     inputQueue = [];
@@ -148,14 +150,23 @@
 
   function spawnFood() {
     const occupied = new Set(snake.map((s) => `${s.x},${s.y}`));
+    const avoidWalls = score < 4;
     const open = [];
+    const fallback = [];
     for (let y = 0; y < GRID; y++) {
       for (let x = 0; x < GRID; x++) {
-        if (!occupied.has(`${x},${y}`)) open.push({ x, y });
+        if (occupied.has(`${x},${y}`)) continue;
+        const isOuter = x === 0 || x === GRID - 1 || y === 0 || y === GRID - 1;
+        if (!avoidWalls || !isOuter) {
+          open.push({ x, y });
+        } else {
+          fallback.push({ x, y });
+        }
       }
     }
-    if (open.length === 0) return;
-    food = open[Math.floor(Math.random() * open.length)];
+    const pool = open.length > 0 ? open : fallback;
+    if (pool.length === 0) return;
+    food = pool[Math.floor(Math.random() * pool.length)];
   }
 
   function spawnTextParticle(x, y, text, color = '#fbbf24') {
@@ -380,7 +391,7 @@
     const cx = (food.x + 0.5) * CELL;
     const cy = (food.y + 0.5) * CELL;
     const pulse = reducedMotionQuery.matches ? 1 : 1 + Math.sin(now * 0.006) * 0.08;
-    const r = CELL * 0.34 * pulse;
+    const r = CELL * 0.38 * pulse;
 
     // Soft glow
     ctx.save();
@@ -404,7 +415,7 @@
     // Leaf
     ctx.fillStyle = '#4ade80';
     ctx.beginPath();
-    ctx.ellipse(cx + 3, cy - r * 0.95, 4.5, 2.5, -0.5, 0, Math.PI * 2);
+    ctx.ellipse(cx + r * 0.25, cy - r * 0.95, r * 0.42, r * 0.22, -0.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
@@ -454,49 +465,49 @@
     if (isScratching) {
       // Happy relieved closed eyes (^ ^) + blush
       ctx.strokeStyle = '#072210';
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = Math.max(2, r * 0.16);
       ctx.lineCap = 'round';
       for (const [ex, ey] of [
         [e1x, e1y],
         [e2x, e2y],
       ]) {
         ctx.beginPath();
-        ctx.arc(ex, ey + 1.5, 3.2, Math.PI * 1.15, Math.PI * 1.85);
+        ctx.arc(ex, ey + r * 0.12, r * 0.25, Math.PI * 1.15, Math.PI * 1.85);
         ctx.stroke();
       }
 
       // Rosy blush cheeks
       ctx.fillStyle = 'rgba(248, 113, 113, 0.55)';
       ctx.beginPath();
-      ctx.arc(cx + perp.x * (r * 0.65), cy + perp.y * (r * 0.65), 3, 0, Math.PI * 2);
-      ctx.arc(cx - perp.x * (r * 0.65), cy - perp.y * (r * 0.65), 3, 0, Math.PI * 2);
+      ctx.arc(cx + perp.x * (r * 0.65), cy + perp.y * (r * 0.65), r * 0.24, 0, Math.PI * 2);
+      ctx.arc(cx - perp.x * (r * 0.65), cy - perp.y * (r * 0.65), r * 0.24, 0, Math.PI * 2);
       ctx.fill();
     } else {
       // Determined eyes
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.arc(e1x, e1y, 3.4, 0, Math.PI * 2);
-      ctx.arc(e2x, e2y, 3.4, 0, Math.PI * 2);
+      ctx.arc(e1x, e1y, r * 0.27, 0, Math.PI * 2);
+      ctx.arc(e2x, e2y, r * 0.27, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = '#09130c';
       ctx.beginPath();
-      ctx.arc(e1x + v.x * 1.1, e1y + v.y * 1.1, 1.8, 0, Math.PI * 2);
-      ctx.arc(e2x + v.x * 1.1, e2y + v.y * 1.1, 1.8, 0, Math.PI * 2);
+      ctx.arc(e1x + v.x * (r * 0.09), e1y + v.y * (r * 0.09), r * 0.14, 0, Math.PI * 2);
+      ctx.arc(e2x + v.x * (r * 0.09), e2y + v.y * (r * 0.09), r * 0.14, 0, Math.PI * 2);
       ctx.fill();
 
       // Occasional flicking tongue
       if (Math.sin(now * 0.008) > 0.45) {
-        const tx = cx + v.x * (r + 6);
-        const ty = cy + v.y * (r + 6);
+        const tx = cx + v.x * (r + r * 0.48);
+        const ty = cy + v.y * (r + r * 0.48);
         ctx.strokeStyle = '#fb7185';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = Math.max(2, r * 0.15);
         ctx.beginPath();
         ctx.moveTo(cx + v.x * r * 0.85, cy + v.y * r * 0.85);
         ctx.lineTo(tx, ty);
-        ctx.lineTo(tx + v.x * 3 + perp.x * 3, ty + v.y * 3 + perp.y * 3);
+        ctx.lineTo(tx + v.x * (r * 0.24) + perp.x * (r * 0.24), ty + v.y * (r * 0.24) + perp.y * (r * 0.24));
         ctx.moveTo(tx, ty);
-        ctx.lineTo(tx + v.x * 3 - perp.x * 3, ty + v.y * 3 - perp.y * 3);
+        ctx.lineTo(tx + v.x * (r * 0.24) - perp.x * (r * 0.24), ty + v.y * (r * 0.24) - perp.y * (r * 0.24));
         ctx.stroke();
       }
     }
@@ -504,46 +515,47 @@
 
   function drawScratchAnimation(now) {
     const anchor = getScratchAnchor();
+    const s = CELL / 28;
     const t = now * 0.028;
-    const bounce = reducedMotionQuery.matches ? 0 : Math.sin(t * 1.5) * 1.8;
+    const bounce = reducedMotionQuery.matches ? 0 : Math.sin(t * 1.5) * 1.8 * s;
 
     ctx.save();
     // Goofy cartoon spheres tucked under the lower body
     const bx = anchor.x;
-    const by = anchor.y + 9 + bounce * 0.4;
+    const by = anchor.y + 9 * s + bounce * 0.4;
 
     ctx.fillStyle = '#86efac';
     ctx.strokeStyle = '#14532d';
-    ctx.lineWidth = 1.6;
-    for (const offset of [-5.5, 5.5]) {
+    ctx.lineWidth = 1.6 * s;
+    for (const offset of [-5.5 * s, 5.5 * s]) {
       ctx.beginPath();
-      ctx.arc(bx + offset, by, 5.2, 0, Math.PI * 2);
+      ctx.arc(bx + offset, by, 5.2 * s, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
     }
 
     // Little cartoon scratching hand/claw moving back and forth
-    const scratchX = bx + (reducedMotionQuery.matches ? 2 : Math.sin(t * 2.2) * 7);
-    const scratchY = by + (reducedMotionQuery.matches ? 0 : Math.cos(t * 2.2) * 2.5);
+    const scratchX = bx + (reducedMotionQuery.matches ? 2 * s : Math.sin(t * 2.2) * 7 * s);
+    const scratchY = by + (reducedMotionQuery.matches ? 0 : Math.cos(t * 2.2) * 2.5 * s);
 
     // Little 3-fingered cartoon hand
     ctx.fillStyle = '#4ade80';
     ctx.strokeStyle = '#09130c';
-    ctx.lineWidth = 1.4;
+    ctx.lineWidth = 1.4 * s;
     ctx.beginPath();
-    ctx.arc(scratchX, scratchY, 4.2, 0, Math.PI * 2);
+    ctx.arc(scratchX, scratchY, 4.2 * s, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
     // Action scratch lines
     ctx.strokeStyle = '#fbbf24';
-    ctx.lineWidth = 1.8;
+    ctx.lineWidth = 1.8 * s;
     for (let i = -1; i <= 1; i++) {
-      const lx = scratchX + 8 + i * 3;
-      const ly = scratchY - 5 + Math.abs(i) * 2;
+      const lx = scratchX + (8 + i * 3) * s;
+      const ly = scratchY + (-5 + Math.abs(i) * 2) * s;
       ctx.beginPath();
       ctx.moveTo(lx, ly);
-      ctx.lineTo(lx + 4, ly - 4);
+      ctx.lineTo(lx + 4 * s, ly - 4 * s);
       ctx.stroke();
     }
     ctx.restore();
