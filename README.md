@@ -11,7 +11,7 @@ Because.
 - **Desktop:** Use **Arrow Keys** or **WASD** to steer. Press **Space** or **P** to pause, **R** to restart.
 - **Mobile:** **Swipe** on the board or tap the on-screen arrows to steer. **Press and hold** the board to pause (let go to jump right back in—*"It's okay, you can scratch your balls too."*).
 - **Difficulty:** Starts nice and relaxed, then speeds up the more apples you eat.
-- Every 4 seconds, the **Itch Meter** maxes out and the snake pauses for a quick `*scritch scritch*` break, after which it gets right back to business. You are welcome to do the same – just press the space key (web) or long-tap the screen (mobile).
+- Every 4 seconds, the **Itch Meter** maxes out and the snake pauses for a quick `*scritch scritch*` break, then gets right back to business. You are welcome to do the same – just press the space key (web) or long-tap the screen (mobile).
 
 
 Don't hit the walls. Don't bite yourself. Check for cooties.
