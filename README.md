@@ -14,4 +14,4 @@ Because.
 - Every 4 seconds, the **Itch Meter** maxes out and the snake pauses for a quick `*scritch scritch*` break, after which it gets right back to business. You are welcome to do the same – just press the space key (web) or long-tap the screen (mobile).
 
 
-Don't hit the walls. Don't bite yourself. Respect the itch.
+Don't hit the walls. Don't bite yourself. Check for cooties.
