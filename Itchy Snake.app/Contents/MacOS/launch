@@ -1,0 +1,12 @@
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LOCAL_HTML="$(cd "$SCRIPT_DIR/../../.." && pwd)/index.html"
+FIXED_HTML="/Users/origold_vol2/Documents/antigravity/snake-scratch-game-v2/index.html"
+
+if [ -f "$LOCAL_HTML" ]; then
+  open "$LOCAL_HTML"
+elif [ -f "$FIXED_HTML" ]; then
+  open "$FIXED_HTML"
+else
+  osascript -e 'display dialog "Could not find index.html for Itchy Snake." buttons {"OK"} default button "OK" with icon caution'
+fi
