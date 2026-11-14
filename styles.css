@@ -280,11 +280,13 @@ body {
   display: none;
 }
 
-@media (hover: none) and (pointer: coarse) {
+@media (hover: none), (pointer: coarse) {
   .touch-dpad {
     display: flex;
   }
+}
 
+@media (hover: none), (pointer: coarse), (max-width: 640px) {
   .hint,
   .desktop-only {
     display: none;
