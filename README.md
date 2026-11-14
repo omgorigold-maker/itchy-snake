@@ -5,7 +5,7 @@
 Classic snake, except every 4 seconds it stops to scratch its snaketicals.
 
 ## Why?
-Because regular snakes just slither around eating apples like productivity robots. This snake has *needs*. Every 4 seconds, the **Itch Meter** maxes out, the snake pauses for a quick `*scritch scritch*` break, blushes with pure relief, and then gets right back to business.
+Every 4 seconds, the **Itch Meter** maxes out, the snake pauses for a quick `*scritch scritch*` break, blushes with pure relief, and then gets right back to business.
 
 ## How to Play
 - **Desktop:** Use **Arrow Keys** or **WASD** to steer. Press **Space** or **P** to pause, **R** to restart.
