@@ -273,9 +273,22 @@ body {
   font-size: 0.8rem;
 }
 
+.mobile-only {
+  display: none;
+}
+
 @media (hover: none) and (pointer: coarse) {
   .touch-dpad {
     display: flex;
+  }
+
+  .hint,
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: inline;
   }
 }
 
