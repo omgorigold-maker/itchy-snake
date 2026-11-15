@@ -2,7 +2,7 @@
 
 **Play it right here (desktop & mobile):** 👉 https://omgorigold-maker.github.io/itchy-snake/
 
-Classic snake, except every 4 seconds it stops to scratch its snaketicals.
+Classic snake, except every 4 seconds it stops to scratch its snaketicles.
 
 ## Why?
 Because. 
